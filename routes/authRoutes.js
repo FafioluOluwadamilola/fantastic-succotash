@@ -1,5 +1,6 @@
 import express from "express";
-import { registerUser } from "../controllers/authController.js";
+import { registerUser, loginUser } from "../controllers/authController.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -7,6 +8,17 @@ const router = express.Router();
 // @desc    Register a new user
 // @access  Public
 router.post("/register", registerUser);
+
+
+// @route   POST /api/auth/login
+// @desc    Authenticate user and get token
+// @access  Public
+router.post("/login", loginUser);
+
+
+router.get("/profile", protect, (req, res) => {
+  res.json(req.user);
+});
 
 
 export default router;
