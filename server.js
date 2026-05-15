@@ -1,8 +1,9 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
 
@@ -14,10 +15,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.get("/", (req, res) => {
     res.send("API is running, World!");
 });
+
 
 const PORT = process.env.PORT || 5000;
 
