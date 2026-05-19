@@ -7,7 +7,8 @@ const cartSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true
+            required: true,
+            unique: true
         },
 
         //Products in the cart
@@ -19,7 +20,7 @@ const cartSchema = new mongoose.Schema(
                 },
                 
                 name: String,
-                Image: String,
+                image: String,
                 price: Number,
 
                 qty: {

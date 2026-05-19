@@ -37,32 +37,41 @@ export const addToCart = async (req, res) => {
       price
     } = req.body;
 
-    // 🔍 Find user's cart
+    // 🔍 Find existing cart
     let cart = await Cart.findOne({
       user: req.user._id
     });
 
-    // 🆕 If cart doesn't exist → create one
+    // 🆕 Create cart if missing
     if (!cart) {
-      cart = new Cart({
+
+      cart = await Cart.create({
         user: req.user._id,
         items: []
       });
+
     }
 
-    // 🔍 Check if item already exists
+    // 🔥 IMPORTANT
+    // Reload newest cart from DB
+    cart = await Cart.findOne({
+      user: req.user._id
+    });
+
+    // 🔍 Find existing item
     const existingItem = cart.items.find(
-      (item) => Number(item.productId) === Number(productId)
+      (item) =>
+        Number(item.productId) === Number(productId)
     );
 
     if (existingItem) {
 
-      // ➕ Increase quantity
+      // ➕ Increase qty
       existingItem.qty += 1;
 
     } else {
 
-      // 🆕 Push new item
+      // 🆕 Add new item
       cart.items.push({
         productId,
         name,
@@ -70,16 +79,44 @@ export const addToCart = async (req, res) => {
         price,
         qty: 1
       });
+
     }
+
+    // 🔥 EXTRA SAFETY
+    // Remove accidental duplicates
+    const uniqueItems = [];
+
+    cart.items.forEach((item) => {
+
+      const existing = uniqueItems.find(
+        (i) =>
+          Number(i.productId) === Number(item.productId)
+      );
+
+      if (existing) {
+
+        existing.qty += item.qty;
+
+      } else {
+
+        uniqueItems.push(item);
+
+      }
+
+    });
+
+    cart.items = uniqueItems;
 
     await cart.save();
 
     res.json(cart);
 
   } catch (error) {
+
     res.status(500).json({
       message: error.message
     });
+
   }
 };
 
