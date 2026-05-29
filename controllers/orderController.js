@@ -62,3 +62,23 @@ export const createOrder = async (req, res) => {
 
   }
 };
+
+
+// 📦 GET USER'S ORDERS
+export const getMyOrders = async (req, res) => {
+  try {
+    
+    const orders = await Order.find({
+      user: req.user.id
+    }).sort({
+      createdAt: -1
+    });
+
+    res.status(200).json(orders);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+}
