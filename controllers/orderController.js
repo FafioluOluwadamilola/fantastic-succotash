@@ -82,3 +82,33 @@ export const getMyOrders = async (req, res) => {
     });
   }
 }
+
+
+// 📦 GET ALL ORDERS BY ID
+export const getOrderById = async (req, res) => {
+  try {
+
+    const order = await Order.findById(req.params.id);
+
+    if(!order){
+      return res.status(404).json({
+        message: "Order not found"
+      });
+    }
+
+    // Ensure user can only access their own orders
+    if(order.user.toString() !== req.user.id){
+      return res.status(401).json({
+        message: "Unauthorized access"
+      });
+    }
+
+    res.status(200).json(order);
+    
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+
+}
